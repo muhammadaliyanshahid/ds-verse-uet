@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Student Profile | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Left Profile Card -->
+    <div class="col-lg-4">
+      <div class="custom-card p-4 text-center">
+        <div class="position-relative d-inline-block mb-3">
+          <div class="rounded-circle bg-navy text-teal p-3 d-flex align-items-center justify-content-center mx-auto" style="width: 90px; height: 90px; background-color: var(--primary-navy);">
+            <i class="fas fa-user-graduate fa-3x"></i>
+          </div>
+        </div>
+
+        <h3 class="brand-font fw-bold text-navy mb-1">{{ user.get_full_name|default:user.username }}</h3>
+        <div class="text-teal fw-semibold mb-2"><i class="fas fa-id-card me-1"></i> {{ profile.roll_number }}</div>
+        
+        <div class="d-flex justify-content-center gap-2 mb-3">
+          {% if profile.section %}
+          <span class="badge bg-secondary px-2.5 py-1">Section {{ profile.section.name }}</span>
+          {% else %}
+          <span class="badge bg-warning text-dark px-2.5 py-1">No Section</span>
+          {% endif %}
+          <span class="badge bg-dark px-2.5 py-1">Semester {{ profile.semester_number }}</span>
+        </div>
+
+        {% if user.is_staff or user.is_superuser %}
+        <div class="alert alert-warning p-2 small fw-bold mb-3">
+          <i class="fas fa-user-shield me-1"></i> Department Administrator Account
+        </div>
+        {% endif %}
+
+        <div class="border-top pt-3 text-start small text-secondary">
+          <div class="mb-2"><i class="fas fa-envelope me-2 text-teal"></i> {{ user.email }}</div>
+          <div class="mb-2"><i class="fas fa-calendar-alt me-2 text-teal"></i> Batch Year: {{ profile.batch_year }}</div>
+          {% if profile.phone_number %}
+          <div class="mb-2"><i class="fas fa-phone me-2 text-teal"></i> {{ profile.phone_number }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Edit Form & Upload History -->
+    <div class="col-lg-8">
+      <div class="custom-card p-4 mb-4">
+        <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+          <i class="fas fa-user-cog text-teal"></i> Edit Student Profile Information
+        </h4>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">First Name</label>
+              {{ form.first_name }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">Last Name</label>
+              {{ form.last_name }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">Email Address</label>
+              {{ form.email }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.roll_number.id_for_label }}" class="form-label fw-semibold">Roll Number</label>
+              {{ form.roll_number }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.section.id_for_label }}" class="form-label fw-semibold">Section</label>
+              {{ form.section }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.semester_number.id_for_label }}" class="form-label fw-semibold">Semester Number (1-8)</label>
+              {{ form.semester_number }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.phone_number.id_for_label }}" class="form-label fw-semibold">Phone Number</label>
+              {{ form.phone_number }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ form.bio.id_for_label }}" class="form-label fw-semibold">Bio / Academic Interests</label>
+              {{ form.bio }}
+            </div>
+          </div>
+
+          <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-uet-primary">
+              <i class="fas fa-save me-1"></i> Save Profile Changes
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Uploaded Past Papers History -->
+      <div class="custom-card p-4">
+        <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+          <i class="fas fa-history text-teal"></i> My Upload Submissions
+        </h4>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Course</th>
+                <th>Exam</th>
+                <th>Upload Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for paper in uploaded_papers %}
+              <tr>
+                <td class="fw-bold">{{ paper.course.code }}: {{ paper.course.title }}</td>
+                <td>{{ paper.get_exam_type_display }} ({{ paper.year }})</td>
+                <td class="small text-muted">{{ paper.upload_date|date:"N j, Y" }}</td>
+                <td>
+                  {% if paper.is_approved %}
+                    <span class="badge badge-approved"><i class="fas fa-check-circle me-1"></i> Approved</span>
+                  {% else %}
+                    <span class="badge badge-pending"><i class="fas fa-clock me-1"></i> Pending Approval</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" class="text-center py-3 text-muted">
+                  You haven't uploaded any past papers yet.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

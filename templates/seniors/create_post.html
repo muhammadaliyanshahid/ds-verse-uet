@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Write Guidance Post | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="custom-card p-4 p-md-5 shadow-lg border-0">
+        <div class="text-center mb-4">
+          <div class="d-inline-flex p-3 rounded-circle bg-teal-subtle text-teal mb-3">
+            <i class="fas fa-pen-nib fa-2x"></i>
+          </div>
+          <h2 class="brand-font fw-bold text-navy">Write Senior Guidance Article</h2>
+          <p class="text-secondary small">Share your experience, study advice, FYP tips, or internship guidance with junior Data Science students</p>
+        </div>
+
+        {% if not user.is_staff and not user.is_superuser %}
+        <div class="alert alert-info border-0 shadow-sm d-flex align-items-center gap-3 mb-4">
+          <i class="fas fa-info-circle fa-2x text-info"></i>
+          <div class="small">
+            <strong>Admin Review Notice:</strong> Your guidance post will be submitted to the admin approval queue before being published on the Senior Guidance Hub.
+          </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-3 mb-4">
+          <i class="fas fa-user-shield fa-2x text-warning"></i>
+          <div class="small">
+            <strong>Administrator Mode:</strong> As an administrator, your post will be published immediately!
+          </div>
+        </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-4">
+              {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">Article Title *</label>
+              {{ form.title }}
+            </div>
+
+            <div class="col-md-4">
+              <label for="{{ form.category.id_for_label }}" class="form-label fw-semibold">Category *</label>
+              {{ form.category }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ form.content.id_for_label }}" class="form-label fw-semibold">Article Content *</label>
+              {{ form.content }}
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top d-grid gap-2">
+            <button type="submit" class="btn btn-uet-primary py-2.5 fs-6">
+              <i class="fas fa-paper-plane me-2"></i> Submit Article for Admin Approval
+            </button>
+            <a href="{% url 'seniors:hub' %}" class="btn btn-outline-secondary py-2">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

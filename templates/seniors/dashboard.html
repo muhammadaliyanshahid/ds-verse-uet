@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Senior Mentor Portal | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="p-4 rounded-4 text-white shadow-sm mb-4" style="background: linear-gradient(135deg, var(--primary-navy), #1e293b);">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h2 class="brand-font fw-bold mb-1">Senior Mentor Dashboard</h2>
+        <div class="small text-slate-300">Answer student queries and manage your guidance posts</div>
+      </div>
+      <a href="{% url 'seniors:create_post' %}" class="btn btn-warning fw-bold text-dark">
+        <i class="fas fa-plus me-1"></i> Write New Article
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Received Queries -->
+    <div class="col-lg-7">
+      <div class="custom-card p-4">
+        <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+          <i class="fas fa-question-circle text-teal"></i> Student Queries & Questions
+        </h4>
+
+        {% for q in queries %}
+        <div class="border rounded-3 p-3 mb-3 bg-slate">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <h5 class="brand-font fw-bold text-navy mb-1">{{ q.subject }}</h5>
+              <div class="small text-muted">
+                From: <strong>{{ q.sender_name }}</strong> {% if q.sender_email %}({{ q.sender_email }}){% endif %} &bull; {{ q.created_at|date:"N j, Y, g:i a" }}
+              </div>
+            </div>
+            {% if q.is_answered %}
+              <span class="badge bg-success-subtle text-success border border-success"><i class="fas fa-check me-1"></i> Answered</span>
+            {% else %}
+              <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pending Reply</span>
+            {% endif %}
+          </div>
+
+          <p class="small text-dark mb-3 p-2 bg-white rounded border border-light">
+            {{ q.message }}
+          </p>
+
+          {% if q.reply %}
+          <div class="p-3 bg-white border border-teal rounded-3 mb-2">
+            <div class="fw-bold small text-teal mb-1"><i class="fas fa-reply me-1"></i> Your Reply:</div>
+            <div class="small text-dark">{{ q.reply }}</div>
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'seniors:dashboard' %}" class="mt-2">
+            {% csrf_token %}
+            <input type="hidden" name="query_id" value="{{ q.id }}">
+            <div class="mb-2">
+              <textarea name="reply" class="form-control form-control-sm" rows="2" placeholder="Write or update your answer to this student..." required>{{ q.reply|default:'' }}</textarea>
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-sm btn-uet-primary">
+                <i class="fas fa-paper-plane me-1"></i> {% if q.is_answered %}Update Reply{% else %}Submit Answer{% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+        {% empty %}
+        <div class="text-center py-4 text-muted">
+          <i class="fas fa-inbox fa-2x mb-2 text-teal"></i>
+          <p class="mb-0">No queries received yet.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- My Guidance Posts -->
+    <div class="col-lg-5">
+      <div class="custom-card p-4">
+        <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+          <i class="fas fa-newspaper text-teal"></i> My Guidance Articles
+        </h4>
+
+        {% for post in my_posts %}
+        <div class="border rounded-3 p-3 mb-3 bg-white">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-teal-subtle text-teal fw-bold">{{ post.get_category_display }}</span>
+            {% if post.is_approved %}
+              <span class="badge badge-approved"><i class="fas fa-check-circle me-1"></i> Approved</span>
+            {% else %}
+              <span class="badge badge-pending"><i class="fas fa-clock me-1"></i> Pending Approval</span>
+            {% endif %}
+          </div>
+          <h5 class="brand-font fw-bold text-navy mb-1">{{ post.title }}</h5>
+          <div class="small text-muted mb-2">{{ post.created_at|date:"N j, Y" }}</div>
+          <p class="small text-secondary line-clamp-2 mb-0">{{ post.content }}</p>
+        </div>
+        {% empty %}
+        <div class="text-center py-4 text-muted">
+          <i class="fas fa-pen fa-2x mb-2 text-teal"></i>
+          <p class="mb-0">You haven't written any guidance articles yet.</p>
+          <a href="{% url 'seniors:create_post' %}" class="btn btn-sm btn-uet-primary mt-2">Write First Article</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

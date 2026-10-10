@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Class Timetables | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header & Section Selector -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div>
+      <h2 class="brand-font fw-bold text-navy mb-1">BS Data Science Class Schedules</h2>
+      <p class="text-secondary small mb-0">Official weekly lecture and laboratory timetable per section</p>
+    </div>
+
+    <!-- Section Switcher Form -->
+    <form method="get" action="{% url 'timetable:grid' %}" class="mt-3 mt-md-0">
+      <div class="d-flex align-items-center gap-2">
+        <label for="section-select" class="fw-bold text-navy text-nowrap small"><i class="fas fa-users-class text-teal me-1"></i> Section:</label>
+        <select name="section" id="section-select" class="form-select form-select-md fw-semibold border-teal shadow-sm" onchange="this.form.submit();">
+          {% for sec in sections %}
+            <option value="{{ sec.id }}" {% if selected_section.id == sec.id %}selected{% endif %}>
+              Section {{ sec.name }} ({{ sec.semester.name }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </form>
+  </div>
+
+  {% if selected_section %}
+  <div class="alert alert-light border shadow-sm rounded-3 mb-4 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+      <div class="rounded-circle bg-navy text-teal p-2.5 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background-color: var(--primary-navy);">
+        <i class="fas fa-calendar-alt fa-lg"></i>
+      </div>
+      <div>
+        <h5 class="brand-font fw-bold text-navy mb-0">Showing Timetable for Section {{ selected_section.name }}</h5>
+        <div class="small text-secondary">Semester: {{ selected_section.semester.name }} | Batch Year: {{ selected_section.batch_year }}</div>
+      </div>
+    </div>
+    {% if user.is_staff or user.is_superuser %}
+    <a href="/admin/timetable/timetableentry/" target="_blank" class="btn btn-sm btn-outline-warning fw-bold">
+      <i class="fas fa-edit me-1"></i> Manage Timetable in Admin
+    </a>
+    {% endif %}
+  </div>
+
+  <!-- Weekly Timetable Grid -->
+  <div class="row g-4">
+    {% for day_name, entries in timetable_by_day.items %}
+    <div class="col-lg-4 col-md-6">
+      <div class="custom-card h-100 p-0 overflow-hidden border">
+        <div class="timetable-day-header d-flex justify-content-between align-items-center">
+          <span><i class="far fa-calendar-check me-2 text-teal"></i> {{ day_name }}</span>
+          <span class="badge bg-secondary rounded-pill small">{{ entries.count }} Classes</span>
+        </div>
+
+        <div class="p-3">
+          {% for entry in entries %}
+          <div class="timetable-card">
+            <div class="class-time">
+              <i class="far fa-clock me-1"></i> {{ entry.start_time|time:"h:i A" }} - {{ entry.end_time|time:"h:i A" }}
+            </div>
+            <div class="class-title">{{ entry.course.code }}: {{ entry.course.title }}</div>
+            <div class="class-meta">
+              <span><i class="fas fa-map-marker-alt text-teal me-1"></i> {{ entry.room }}</span>
+              <span><i class="fas fa-user-tie text-secondary me-1"></i> {{ entry.instructor_name }}</span>
+            </div>
+          </div>
+          {% empty %}
+          <div class="py-4 text-center text-muted">
+            <i class="fas fa-smile-beam fa-2x mb-2 text-secondary opacity-50"></i>
+            <div class="small fw-semibold">No Classes Scheduled</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="custom-card p-5 text-center my-4">
+    <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
+    <h4 class="brand-font fw-bold text-navy mb-2">No Sections Configured</h4>
+    <p class="text-secondary small">Please select or configure department sections to view class schedules.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

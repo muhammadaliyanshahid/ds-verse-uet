@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Senior Mentors & Guidance Hub | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header Banner -->
+  <div class="p-4 rounded-4 text-white shadow-sm mb-4" style="background: linear-gradient(135deg, var(--primary-navy), #1e1b4b);">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-8">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle bg-teal text-white p-3 d-flex align-items-center justify-content-center" style="width: 56px; height: 56px; background-color: var(--accent-teal);">
+            <i class="fas fa-user-tie fa-2x"></i>
+          </div>
+          <div>
+            <h2 class="brand-font fw-bold mb-1">Senior Mentors & Guidance Hub</h2>
+            <p class="text-slate-300 small mb-0" style="color: #cbd5e1;">
+              Connect with senior students and alumni for FYP advice, course difficulties, career guidance, and internships. No account required to ask questions!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 text-lg-end d-flex flex-wrap gap-2 justify-content-lg-end">
+        <button type="button" class="btn btn-uet-primary" data-bs-toggle="modal" data-bs-target="#askQueryModal">
+          <i class="fas fa-question-circle me-1"></i> Ask a Query / Question
+        </button>
+        {% if user.is_authenticated and user.profile.role == 'senior' %}
+        <a href="{% url 'seniors:create_post' %}" class="btn btn-warning fw-bold text-dark">
+          <i class="fas fa-pen me-1"></i> Write Guidance Post
+        </a>
+        {% else %}
+        <a href="{% url 'seniors:signup' %}" class="btn btn-uet-outline text-white border-light">
+          <i class="fas fa-user-plus me-1"></i> Senior Mentor Sign Up
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Senior Mentors Directory Section -->
+  <div class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="brand-font fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+        <i class="fas fa-users-cog text-teal"></i> Approved Senior Mentors & Alumni
+      </h3>
+    </div>
+
+    <div class="row g-4">
+      {% for profile in approved_seniors %}
+      <div class="col-md-6 col-lg-4">
+        <div class="custom-card p-4 h-100 d-flex flex-column justify-content-between border">
+          <div>
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="rounded-circle bg-navy text-teal p-2.5 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background-color: var(--primary-navy);">
+                <i class="fas fa-user-graduate fa-lg"></i>
+              </div>
+              <div>
+                <h5 class="brand-font fw-bold text-navy mb-0">{{ profile.user.get_full_name|default:profile.user.username }}</h5>
+                <div class="small text-teal fw-semibold">Batch {{ profile.batch_year }} (Roll: {{ profile.roll_number }})</div>
+              </div>
+            </div>
+
+            {% if profile.expertise %}
+            <div class="mb-2">
+              <span class="small text-muted fw-semibold">Expertise:</span>
+              <div class="badge bg-light text-navy border mt-1 d-block text-wrap text-start p-2 fs-7">
+                <i class="fas fa-star text-warning me-1"></i> {{ profile.expertise }}
+              </div>
+            </div>
+            {% endif %}
+
+            {% if profile.bio %}
+            <p class="small text-secondary mb-3 mt-2 line-clamp-3">
+              {{ profile.bio }}
+            </p>
+            {% endif %}
+          </div>
+
+          <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+            {% if profile.linkedin_url %}
+            <a href="{{ profile.linkedin_url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="LinkedIn Profile">
+              <i class="fab fa-linkedin me-1"></i> LinkedIn
+            </a>
+            {% else %}
+            <span></span>
+            {% endif %}
+
+            <button type="button" class="btn btn-sm btn-uet-primary" onclick="openTargetedQuery('{{ profile.user.id }}', '{{ profile.user.get_full_name|default:profile.user.username }}')">
+              <i class="fas fa-comment-alt me-1"></i> Reach Out
+            </button>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="custom-card p-4 text-center text-muted">
+          <i class="fas fa-user-clock fa-2x mb-2 text-teal"></i>
+          <p class="mb-0">Senior mentors are registering. Be the first senior to <a href="{% url 'seniors:signup' %}" class="text-teal fw-bold">sign up as a mentor</a>!</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Guidance Articles & Advice Posts Section -->
+  <div class="custom-card p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+      <div>
+        <h3 class="brand-font fw-bold text-navy mb-1">Senior Advice & Guidance Feed</h3>
+        <p class="text-secondary small mb-0">Verified guidance posts written by seniors and approved by department staff</p>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="mt-3 mt-md-0">
+        <select class="form-select form-select-sm fw-semibold" onchange="location = this.value;">
+          <option value="{% url 'seniors:hub' %}" {% if not selected_category %}selected{% endif %}>All Guidance Categories</option>
+          {% for code, label in categories %}
+            <option value="{% url 'seniors:hub' %}?category={{ code }}" {% if selected_category == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% for post in posts %}
+      <div class="col-md-6">
+        <div class="custom-card p-4 h-100 bg-slate border">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-teal-subtle text-teal fw-bold px-2.5 py-1" style="background-color: #ccfbf1; color: #0f766e;">
+              {{ post.get_category_display }}
+            </span>
+            <span class="small text-muted"><i class="far fa-clock me-1"></i> {{ post.created_at|date:"N j, Y" }}</span>
+          </div>
+
+          <h4 class="brand-font fw-bold text-navy mb-2">{{ post.title }}</h4>
+          <p class="text-secondary small mb-3 style-content" style="white-space: pre-line; line-height: 1.6;">
+            {{ post.content }}
+          </p>
+
+          <div class="pt-3 border-top d-flex justify-content-between align-items-center">
+            <div class="small fw-semibold text-navy">
+              <i class="fas fa-user-graduate text-teal me-1"></i> {{ post.senior.get_full_name|default:post.senior.username }}
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success"><i class="fas fa-check-circle me-1"></i> Admin Approved</span>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center py-4 text-muted">
+        <i class="fas fa-folder-open fa-2x mb-2 text-teal"></i>
+        <p class="mb-0">No guidance posts published in this category yet.</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Answered Student Queries Preview -->
+  {% if answered_queries %}
+  <div class="custom-card p-4 mt-4">
+    <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+      <i class="fas fa-comments text-teal"></i> Answered Student Queries & FAQs
+    </h4>
+    <div class="accordion" id="queriesAccordion">
+      {% for q in answered_queries %}
+      <div class="accordion-item border rounded-3 mb-2">
+        <h2 class="accordion-header" id="heading{{ q.id }}">
+          <button class="accordion-button collapsed fw-bold text-navy" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ q.id }}" aria-expanded="false" aria-controls="collapse{{ q.id }}">
+            <i class="fas fa-question-circle text-teal me-2"></i> {{ q.subject }} <span class="small text-muted ms-2 fw-normal">(Asked by {{ q.sender_name }})</span>
+          </button>
+        </h2>
+        <div id="collapse{{ q.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ q.id }}" data-bs-parent="#queriesAccordion">
+          <div class="accordion-body bg-slate">
+            <div class="mb-3">
+              <div class="fw-bold small text-navy mb-1">Question:</div>
+              <div class="small text-secondary">{{ q.message }}</div>
+            </div>
+            <div class="p-3 bg-white border rounded-3 border-teal">
+              <div class="fw-bold small text-teal mb-1">
+                <i class="fas fa-reply me-1"></i> Answer from Senior Mentor ({% if q.target_senior %}{{ q.target_senior.get_full_name|default:q.target_senior.username }}{% else %}Mentor Team{% endif %}):
+              </div>
+              <div class="small text-dark">{{ q.reply }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Modal: Ask a Senior Query (Open to Guests & Students) -->
+<div class="modal fade" id="askQueryModal" tabindex="-1" aria-labelledby="askQueryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-navy text-white">
+        <h5 class="modal-title brand-font fw-bold" id="askQueryModalLabel">
+          <i class="fas fa-paper-plane text-teal me-2"></i> Reach Out to Senior Mentors
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form method="post" action="{% url 'seniors:submit_query' %}">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="alert alert-info border-0 shadow-sm small mb-3">
+            <i class="fas fa-info-circle me-1"></i> No account required! Any student or guest can reach out for guidance regarding courses, difficulties, or FYPs.
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="{{ query_form.sender_name.id_for_label }}" class="form-label fw-semibold">Your Name or Roll Number *</label>
+              {{ query_form.sender_name }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ query_form.sender_email.id_for_label }}" class="form-label fw-semibold">Your Email (Optional)</label>
+              {{ query_form.sender_email }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ query_form.target_senior.id_for_label }}" class="form-label fw-semibold">Target Senior Mentor</label>
+              {{ query_form.target_senior }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ query_form.subject.id_for_label }}" class="form-label fw-semibold">Query Subject *</label>
+              {{ query_form.subject }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ query_form.message.id_for_label }}" class="form-label fw-semibold">Message / Query Details *</label>
+              {{ query_form.message }}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-uet-primary">
+            <i class="fas fa-paper-plane me-1"></i> Send Query to Seniors
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openTargetedQuery(seniorId, seniorName) {
+    const select = document.getElementById('{{ query_form.target_senior.id_for_label }}');
+    if (select) {
+        select.value = seniorId;
+    }
+    const modal = new bootstrap.Modal(document.getElementById('askQueryModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

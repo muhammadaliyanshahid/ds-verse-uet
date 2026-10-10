@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Log In | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="custom-card p-4 p-md-5 shadow-lg border-0">
+        <div class="text-center mb-4">
+          <div class="d-inline-flex p-3 rounded-circle bg-teal-subtle text-teal mb-3">
+            <i class="fas fa-sign-in-alt fa-2x"></i>
+          </div>
+          <h2 class="brand-font fw-bold text-navy">Portal Sign In</h2>
+          <p class="text-secondary small">Access UET Data Science Past Papers & Timetables</p>
+        </div>
+
+        <form method="post" action="{% url 'accounts:login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="id_username" class="form-label fw-semibold">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="fas fa-user text-secondary"></i></span>
+              <input type="text" name="username" id="id_username" class="form-control py-2" placeholder="Enter username" required autofocus>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="id_password" class="form-label fw-semibold">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="fas fa-lock text-secondary"></i></span>
+              <input type="password" name="password" id="id_password" class="form-control py-2" placeholder="Enter password" required>
+            </div>
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-uet-primary py-2.5 fs-6">
+              <i class="fas fa-key me-2"></i> Sign In to Portal
+            </button>
+          </div>
+
+          <div class="text-center small text-secondary">
+            Don't have a student profile yet? <a href="{% url 'accounts:signup' %}" class="text-teal fw-semibold">Register Student Account</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

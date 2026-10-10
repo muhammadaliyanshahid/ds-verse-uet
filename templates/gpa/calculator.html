@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}GPA & CGPA Calculator | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div>
+      <h2 class="brand-font fw-bold text-navy mb-1">UET BS Data Science GPA Calculator</h2>
+      <p class="text-secondary small mb-0">Calculate your Semester GPA (SGPA) and Cumulative GPA (CGPA) accurately based on UET grading scale</p>
+    </div>
+    <span class="badge bg-teal-subtle text-teal fw-semibold px-3 py-2 rounded-pill mt-3 mt-md-0">
+      <i class="fas fa-calculator me-1"></i> Official UET 4.0 Scale
+    </span>
+  </div>
+
+  <div class="row g-4">
+    <!-- Calculator Card -->
+    <div class="col-lg-8">
+      <div class="custom-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="brand-font fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+            <i class="fas fa-list-ol text-teal"></i> Course Grades Entry
+          </h4>
+          <button type="button" id="add-course-btn" class="btn btn-sm btn-uet-primary">
+            <i class="fas fa-plus me-1"></i> Add Course Row
+          </button>
+        </div>
+
+        <form id="gpa-form" onsubmit="return false;">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle" id="courses-table">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 40%;">Course Title (Optional)</th>
+                  <th style="width: 25%;">Credit Hours</th>
+                  <th style="width: 25%;">Grade Obtained</th>
+                  <th style="width: 10%; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="course-rows">
+                <!-- Initial 4 rows -->
+                <tr class="course-row">
+                  <td><input type="text" class="form-control form-control-sm course-name" placeholder="e.g. Machine Learning"></td>
+                  <td>
+                    <select class="form-select form-select-sm credit-hours" onchange="calculateGPA()">
+                      <option value="4">4 Credit Hours</option>
+                      <option value="3" selected>3 Credit Hours</option>
+                      <option value="2">2 Credit Hours</option>
+                      <option value="1">1 Credit Hour</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-select form-select-sm grade-select" onchange="calculateGPA()">
+                      <option value="4.00">A+ (4.00)</option>
+                      <option value="4.00">A (4.00)</option>
+                      <option value="3.70">A- (3.70)</option>
+                      <option value="3.30">B+ (3.30)</option>
+                      <option value="3.00" selected>B (3.00)</option>
+                      <option value="2.70">B- (2.70)</option>
+                      <option value="2.30">C+ (2.30)</option>
+                      <option value="2.00">C (2.00)</option>
+                      <option value="1.70">C- (1.70)</option>
+                      <option value="1.30">D+ (1.30)</option>
+                      <option value="0.00">F (0.00)</option>
+                    </select>
+                  </td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-row-btn" onclick="removeRow(this)" title="Remove Course">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <tr class="course-row">
+                  <td><input type="text" class="form-control form-control-sm course-name" placeholder="e.g. Database Systems"></td>
+                  <td>
+                    <select class="form-select form-select-sm credit-hours" onchange="calculateGPA()">
+                      <option value="4" selected>4 Credit Hours</option>
+                      <option value="3">3 Credit Hours</option>
+                      <option value="2">2 Credit Hours</option>
+                      <option value="1">1 Credit Hour</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-select form-select-sm grade-select" onchange="calculateGPA()">
+                      <option value="4.00">A+ (4.00)</option>
+                      <option value="4.00" selected>A (4.00)</option>
+                      <option value="3.70">A- (3.70)</option>
+                      <option value="3.30">B+ (3.30)</option>
+                      <option value="3.00">B (3.00)</option>
+                      <option value="2.70">B- (2.70)</option>
+                      <option value="2.30">C+ (2.30)</option>
+                      <option value="2.00">C (2.00)</option>
+                      <option value="1.70">C- (1.70)</option>
+                      <option value="1.30">D+ (1.30)</option>
+                      <option value="0.00">F (0.00)</option>
+                    </select>
+                  </td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-row-btn" onclick="removeRow(this)" title="Remove Course">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <tr class="course-row">
+                  <td><input type="text" class="form-control form-control-sm course-name" placeholder="e.g. Statistical Inference"></td>
+                  <td>
+                    <select class="form-select form-select-sm credit-hours" onchange="calculateGPA()">
+                      <option value="4">4 Credit Hours</option>
+                      <option value="3" selected>3 Credit Hours</option>
+                      <option value="2">2 Credit Hours</option>
+                      <option value="1">1 Credit Hour</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-select form-select-sm grade-select" onchange="calculateGPA()">
+                      <option value="4.00" selected>A+ (4.00)</option>
+                      <option value="4.00">A (4.00)</option>
+                      <option value="3.70">A- (3.70)</option>
+                      <option value="3.30">B+ (3.30)</option>
+                      <option value="3.00">B (3.00)</option>
+                      <option value="2.70">B- (2.70)</option>
+                      <option value="2.30">C+ (2.30)</option>
+                      <option value="2.00">C (2.00)</option>
+                      <option value="1.70">C- (1.70)</option>
+                      <option value="1.30">D+ (1.30)</option>
+                      <option value="0.00">F (0.00)</option>
+                    </select>
+                  </td>
+                  <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-row-btn" onclick="removeRow(this)" title="Remove Course">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetCalculator()">
+              <i class="fas fa-undo me-1"></i> Reset All Rows
+            </button>
+            <button type="button" class="btn btn-uet-primary" onclick="calculateGPA()">
+              <i class="fas fa-calculator me-1"></i> Calculate GPA
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CGPA Cumulative Combined Calculator -->
+      <div class="custom-card p-4">
+        <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+          <i class="fas fa-chart-line text-teal"></i> Calculate Cumulative CGPA (Previous Semesters)
+        </h4>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Prior Total Credit Hours Completed</label>
+            <input type="number" id="prior-credits" class="form-control" placeholder="e.g. 64" min="0" oninput="calculateGPA()">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Prior Cumulative CGPA</label>
+            <input type="number" id="prior-cgpa" class="form-control" placeholder="e.g. 3.45" min="0" max="4.0" step="0.01" oninput="calculateGPA()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Result Summary & Grading Scale -->
+    <div class="col-lg-4">
+      <!-- GPA Summary Card -->
+      <div class="custom-card p-4 text-center mb-4 border border-teal shadow-md" style="background: linear-gradient(135deg, var(--primary-navy), #1e293b); color: white;">
+        <div class="small text-teal fw-bold mb-1"><i class="fas fa-star me-1"></i> SEMESTER GPA (SGPA)</div>
+        <div class="display-3 fw-bold text-white brand-font my-2" id="sgpa-result">3.56</div>
+        
+        <div class="pt-3 border-top border-secondary mt-3">
+          <div class="row g-2 text-start small" style="color: #cbd5e1;">
+            <div class="col-6">Total Credit Hours:</div>
+            <div class="col-6 text-end fw-bold text-white" id="total-credits-display">10</div>
+            <div class="col-6">Total Quality Points:</div>
+            <div class="col-6 text-end fw-bold text-teal" id="total-points-display">35.60</div>
+            <div class="col-6 border-top border-secondary pt-1 fw-semibold text-warning">Overall CGPA:</div>
+            <div class="col-6 border-top border-secondary pt-1 text-end fw-bold text-warning" id="cgpa-result">3.56</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grading Scale Reference Table -->
+      <div class="custom-card p-4">
+        <h5 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+          <i class="fas fa-table text-teal"></i> UET 4.0 Grading Scale
+        </h5>
+
+        <div class="table-responsive">
+          <table class="table table-sm table-striped align-middle mb-0 small">
+            <thead class="table-light">
+              <tr>
+                <th>Grade</th>
+                <th>GPA Value</th>
+                <th>Marks Range</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for grade, points, marks in grade_scale %}
+              <tr>
+                <td class="fw-bold text-navy">{{ grade }}</td>
+                <td class="fw-semibold text-teal">{{ points|floatformat:2 }}</td>
+                <td class="text-secondary">{{ marks }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function calculateGPA() {
+    const rows = document.querySelectorAll('.course-row');
+    let totalCredits = 0;
+    let totalQualityPoints = 0;
+
+    rows.forEach(row => {
+        const credits = parseFloat(row.querySelector('.credit-hours').value) || 0;
+        const gradeValue = parseFloat(row.querySelector('.grade-select').value) || 0;
+        
+        totalCredits += credits;
+        totalQualityPoints += (credits * gradeValue);
+    });
+
+    const sgpa = totalCredits > 0 ? (totalQualityPoints / totalCredits) : 0;
+
+    document.getElementById('total-credits-display').textContent = totalCredits;
+    document.getElementById('total-points-display').textContent = totalQualityPoints.toFixed(2);
+    document.getElementById('sgpa-result').textContent = sgpa.toFixed(2);
+
+    // Calculate Cumulative CGPA if prior values entered
+    const priorCredits = parseFloat(document.getElementById('prior-credits').value) || 0;
+    const priorCGPA = parseFloat(document.getElementById('prior-cgpa').value) || 0;
+
+    if (priorCredits > 0 && priorCGPA > 0) {
+        const priorPoints = priorCredits * priorCGPA;
+        const combinedCredits = totalCredits + priorCredits;
+        const combinedPoints = totalQualityPoints + priorPoints;
+        const cgpa = combinedCredits > 0 ? (combinedPoints / combinedCredits) : 0;
+        document.getElementById('cgpa-result').textContent = cgpa.toFixed(2);
+    } else {
+        document.getElementById('cgpa-result').textContent = sgpa.toFixed(2);
+    }
+}
+
+function addCourseRow() {
+    const tbody = document.getElementById('course-rows');
+    const newRow = document.createElement('tr');
+    newRow.className = 'course-row';
+    newRow.innerHTML = `
+        <td><input type="text" class="form-control form-control-sm course-name" placeholder="Course Name"></td>
+        <td>
+          <select class="form-select form-select-sm credit-hours" onchange="calculateGPA()">
+            <option value="4">4 Credit Hours</option>
+            <option value="3" selected>3 Credit Hours</option>
+            <option value="2">2 Credit Hours</option>
+            <option value="1">1 Credit Hour</option>
+          </select>
+        </td>
+        <td>
+          <select class="form-select form-select-sm grade-select" onchange="calculateGPA()">
+            <option value="4.00">A+ (4.00)</option>
+            <option value="4.00">A (4.00)</option>
+            <option value="3.70">A- (3.70)</option>
+            <option value="3.30">B+ (3.30)</option>
+            <option value="3.00" selected>B (3.00)</option>
+            <option value="2.70">B- (2.70)</option>
+            <option value="2.30">C+ (2.30)</option>
+            <option value="2.00">C (2.00)</option>
+            <option value="1.70">C- (1.70)</option>
+            <option value="1.30">D+ (1.30)</option>
+            <option value="0.00">F (0.00)</option>
+          </select>
+        </td>
+        <td class="text-center">
+          <button type="button" class="btn btn-sm btn-outline-danger remove-row-btn" onclick="removeRow(this)" title="Remove Course">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </td>
+    `;
+    tbody.appendChild(newRow);
+    calculateGPA();
+}
+
+function removeRow(btn) {
+    const rows = document.querySelectorAll('.course-row');
+    if (rows.length > 1) {
+        btn.closest('tr').remove();
+        calculateGPA();
+    }
+}
+
+function resetCalculator() {
+    document.getElementById('gpa-form').reset();
+    document.getElementById('prior-credits').value = '';
+    document.getElementById('prior-cgpa').value = '';
+    calculateGPA();
+}
+
+document.getElementById('add-course-btn').addEventListener('click', addCourseRow);
+
+// Initial calculation on load
+document.addEventListener('DOMContentLoaded', calculateGPA);
+</script>
+{% endblock %}

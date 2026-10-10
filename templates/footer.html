@@ -1,0 +1,58 @@
+{% load static %}
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4 col-md-6">
+        <h5 class="text-white brand-font fw-bold mb-3 d-flex align-items-center gap-2">
+          <img src="{% static 'img/uet_ds_logo.png' %}" alt="Logo" style="height: 36px; width: auto; object-fit: contain;">
+          <span>Institute of Data Science, UET</span>
+        </h5>
+        <p class="small text-slate-300 mb-3" style="color: #cbd5e1; line-height: 1.6;">
+          Official academic portal for the Department of Data Science, University of Engineering and Technology (UET) Lahore. Empowering students with centralized timetables, past paper archives, and academic collaboration.
+        </p>
+        <div class="d-flex gap-2 flex-wrap">
+          <span class="badge bg-navy-light border border-secondary text-white px-2.5 py-1.5"><i class="fas fa-university me-1 text-teal"></i> UET Main Campus</span>
+          <span class="badge bg-navy-light border border-secondary text-white px-2.5 py-1.5"><i class="fas fa-code me-1 text-teal"></i> BS DS Department</span>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <h6 class="text-white fw-bold mb-3">Quick Navigation</h6>
+        <ul class="list-unstyled small d-grid gap-2">
+          <li><a href="{% url 'papers:landing' %}" class="footer-link">Portal Home</a></li>
+          <li><a href="{% url 'papers:paper_list' %}" class="footer-link">Past Papers Repository</a></li>
+          <li><a href="{% url 'timetable:grid' %}" class="footer-link">Class Timetables</a></li>
+          <li><a href="{% url 'papers:paper_upload' %}" class="footer-link">Upload Past Paper</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-2 col-md-6">
+        <h6 class="text-white fw-bold mb-3">Academic Programs</h6>
+        <ul class="list-unstyled small d-grid gap-2" style="color: #cbd5e1;">
+          <li><i class="fas fa-chevron-right text-teal me-2"></i>BS Data Science</li>
+          <li><i class="fas fa-chevron-right text-teal me-2"></i>MS Data Science</li>
+          <li><i class="fas fa-chevron-right text-teal me-2"></i>PhD Data Science</li>
+          <li><i class="fas fa-chevron-right text-teal me-2"></i>AI & ML Labs</li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <h6 class="text-white fw-bold mb-3">Department Location</h6>
+        <ul class="list-unstyled small d-grid gap-2" style="color: #cbd5e1;">
+          <li><i class="fas fa-map-marker-alt text-teal me-2"></i>Department of Data Science, UET GT Road, Lahore</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary opacity-50">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small" style="color: #94a3b8;">
+      <div>
+        &copy; {% now "Y" %} UET Lahore BS Data Science Department. All rights reserved.
+      </div>
+      <div class="mt-2 mt-md-0 text-white fw-semibold">
+        Built for Students & Student-Admins
+      </div>
+    </div>
+  </div>
+</footer>

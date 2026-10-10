@@ -1,0 +1,113 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark navbar-uet sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'papers:landing' %}">
+      <img src="{% static 'img/uet_ds_logo.png' %}" alt="UET Data Science Logo" class="brand-logo me-2" style="height: 48px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+      <div>
+        <span class="d-block brand-font" style="font-weight: 800; line-height: 1.1;">INSTITUTE OF DATA SCIENCE</span>
+        <span class="d-block text-teal" style="font-size: 0.75rem; font-weight: 600; color: #14b8a6; letter-spacing: 0.05em;">UET LAHORE</span>
+      </div>
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'landing' %}active{% endif %}" href="{% url 'papers:landing' %}">
+            <i class="fas fa-home me-1"></i> Home
+          </a>
+        </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'papers:dashboard' %}">
+            <i class="fas fa-columns me-1"></i> Dashboard
+          </a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'paper_list' %}active{% endif %}" href="{% url 'papers:paper_list' %}">
+            <i class="fas fa-book-open me-1"></i> Past Papers
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'paper_upload' %}active{% endif %}" href="{% url 'papers:paper_upload' %}">
+            <i class="fas fa-cloud-upload-alt me-1"></i> Upload Paper
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'grid' %}active{% endif %}" href="{% url 'timetable:grid' %}">
+            <i class="fas fa-calendar-alt me-1"></i> Timetable
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'gpa_calculator' %}active{% endif %}" href="{% url 'papers:gpa_calculator' %}">
+            <i class="fas fa-calculator me-1"></i> GPA Calculator
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.app_name == 'seniors' %}active{% endif %}" href="{% url 'seniors:hub' %}">
+            <i class="fas fa-user-tie me-1"></i> Senior Mentors
+          </a>
+        </li>
+        {% if user.is_authenticated and user.is_staff %}
+        <li class="nav-item">
+          <a class="nav-link text-warning fw-bold {% if request.resolver_match.url_name == 'pending_queue' %}active{% endif %}" href="{% url 'papers:pending_queue' %}">
+            <i class="fas fa-user-shield me-1"></i> Approval Queue
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+
+      <div class="d-flex align-items-center gap-2">
+        {% if user.is_authenticated %}
+          {% if user.is_staff or user.is_superuser %}
+            <a href="/admin/" target="_blank" class="btn btn-sm btn-outline-light me-2 d-none d-md-inline-flex align-items-center gap-1" title="Django Admin Dashboard">
+              <i class="fas fa-cogs"></i> Django Admin
+            </a>
+          {% endif %}
+          <div class="dropdown">
+            <button class="btn btn-uet-primary dropdown-toggle d-flex align-items-center gap-2" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user-circle fa-lg"></i>
+              <span>{{ user.first_name|default:user.username }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="userMenu">
+              <li>
+                <a class="dropdown-item fw-semibold" href="{% url 'accounts:profile' %}">
+                  <i class="fas fa-id-card me-2 text-teal"></i> Profile Details
+                </a>
+              </li>
+              {% if user.is_staff or user.is_superuser %}
+              <li>
+                <a class="dropdown-item fw-semibold text-warning" href="{% url 'papers:pending_queue' %}">
+                  <i class="fas fa-tasks me-2"></i> Approval Queue
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item fw-semibold" href="/admin/" target="_blank">
+                  <i class="fas fa-tools me-2 text-info"></i> Full Admin Panel
+                </a>
+              </li>
+              {% endif %}
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-danger fw-semibold" href="{% url 'accounts:logout' %}">
+                  <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+                </a>
+              </li>
+            </ul>
+          </div>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="btn btn-uet-outline text-white border-secondary">
+            Log In
+          </a>
+          <a href="{% url 'accounts:signup' %}" class="btn btn-uet-primary">
+            Student Sign Up
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>

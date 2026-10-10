@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}404 - Page Not Found | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-5">
+  <div class="row justify-content-center text-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="custom-card p-5 shadow-lg border-0">
+        <div class="display-1 fw-bold text-teal brand-font mb-2">404</div>
+        <h3 class="brand-font fw-bold text-navy mb-3">Page Not Found</h3>
+        <p class="text-secondary small mb-4">
+          The academic resource, past paper, or schedule page you are looking for might have been moved, renamed, or deleted.
+        </p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{% url 'papers:landing' %}" class="btn btn-uet-primary">
+            <i class="fas fa-home me-1"></i> Back to Portal Home
+          </a>
+          <a href="{% url 'papers:paper_list' %}" class="btn btn-uet-outline">
+            <i class="fas fa-search me-1"></i> Search Past Papers
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

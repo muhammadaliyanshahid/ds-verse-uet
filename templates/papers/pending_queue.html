@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Approval Queue | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-warning text-dark fw-bold px-3 py-1.5 rounded-pill">
+          <i class="fas fa-shield-alt me-1"></i> ADMIN CONTROL
+        </span>
+        <h2 class="brand-font fw-bold text-navy mb-0">Department Verification & Approval Portal</h2>
+      </div>
+      <p class="text-secondary small mt-1 mb-0">Approve past papers, senior mentor registrations, and advice posts</p>
+    </div>
+    <a href="/admin/" target="_blank" class="btn btn-outline-dark mt-3 mt-md-0">
+      <i class="fas fa-cogs me-1"></i> Django Full Admin Panel
+    </a>
+  </div>
+
+  <!-- Past Papers Queue -->
+  <div class="custom-card p-4 mb-5">
+    <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+      <i class="fas fa-file-pdf text-teal"></i> Pending Past Papers Queue
+    </h4>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Course & Exam</th>
+            <th>Academic Semester</th>
+            <th>Student Uploader</th>
+            <th>Uploaded Date</th>
+            <th>File Preview</th>
+            <th class="text-end">Verification Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for paper in pending_papers %}
+          <tr>
+            <td>
+              <div class="fw-bold text-navy">{{ paper.course.code }}: {{ paper.course.title }}</div>
+              <span class="badge {% if paper.exam_type == 'mid' %}badge-mid{% elif paper.exam_type == 'final' %}badge-final{% else %}badge-quiz{% endif %}">
+                {{ paper.get_exam_type_display }} ({{ paper.year }})
+              </span>
+            </td>
+            <td>
+              <span class="small fw-semibold text-secondary">{{ paper.semester.name }}</span>
+            </td>
+            <td>
+              <div class="fw-semibold text-dark">{{ paper.get_uploader_display_name }}</div>
+              <div class="small text-muted">{% if paper.uploader %}{{ paper.uploader.email }}{% else %}Guest Student Submission{% endif %}</div>
+            </td>
+            <td class="small text-muted">{{ paper.upload_date|date:"N j, Y, g:i a" }}</td>
+            <td>
+              <a href="{% url 'papers:paper_download' paper.pk %}" class="btn btn-sm btn-outline-info" target="_blank">
+                <i class="fas fa-file-pdf me-1"></i> Preview PDF
+              </a>
+            </td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end gap-2">
+                <form method="post" action="{% url 'papers:process_paper' paper.pk 'approve' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-success fw-bold">
+                    <i class="fas fa-check me-1"></i> Approve
+                  </button>
+                </form>
+
+                <form method="post" action="{% url 'papers:process_paper' paper.pk 'reject' %}" class="d-inline" onsubmit="return confirm('Are you sure you want to reject and delete this submission?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">
+                    <i class="fas fa-times me-1"></i> Reject
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted small">
+              No pending past papers at this time.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Senior Mentor Registrations Queue -->
+  <div class="custom-card p-4 mb-5">
+    <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+      <i class="fas fa-user-tie text-teal"></i> Pending Senior Mentor registrations
+    </h4>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Mentor Name & Roll Number</th>
+            <th>Batch Year</th>
+            <th>Linkedin URL</th>
+            <th>Expertise Areas</th>
+            <th>Bio / Info</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for senior in pending_seniors %}
+          <tr>
+            <td>
+              <div class="fw-bold text-navy">{{ senior.user.get_full_name|default:senior.user.username }}</div>
+              <div class="small text-muted">{{ senior.roll_number }} &bull; {{ senior.user.email }}</div>
+            </td>
+            <td class="fw-semibold text-secondary">{{ senior.batch_year }}</td>
+            <td>
+              {% if senior.linkedin_url %}
+              <a href="{{ senior.linkedin_url }}" target="_blank" class="small text-decoration-none text-primary fw-semibold">
+                <i class="fab fa-linkedin me-1"></i> Profile
+              </a>
+              {% else %}
+              <span class="text-muted small">None</span>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge bg-light text-navy border small">{{ senior.expertise|default:"General Guidance" }}</span>
+            </td>
+            <td class="small text-secondary" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              {{ senior.bio|default:"No bio provided." }}
+            </td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end gap-2">
+                <form method="post" action="{% url 'seniors:process_approval' 'mentor' senior.pk 'approve' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-success fw-bold">
+                    <i class="fas fa-check me-1"></i> Approve
+                  </button>
+                </form>
+
+                <form method="post" action="{% url 'seniors:process_approval' 'mentor' senior.pk 'reject' %}" class="d-inline" onsubmit="return confirm('Are you sure you want to reject this mentor registration?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">
+                    <i class="fas fa-times me-1"></i> Reject
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted small">
+              No pending senior mentor registrations at this time.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Senior Guidance Posts Queue -->
+  <div class="custom-card p-4">
+    <h4 class="brand-font fw-bold text-navy mb-3 d-flex align-items-center gap-2">
+      <i class="fas fa-newspaper text-teal"></i> Pending Senior Guidance Posts
+    </h4>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Author Senior</th>
+            <th>Post Title</th>
+            <th>Category</th>
+            <th>Post Content Preview</th>
+            <th>Submitted Date</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for post in pending_posts %}
+          <tr>
+            <td>
+              <div class="fw-bold text-navy">{{ post.senior.get_full_name|default:post.senior.username }}</div>
+              <div class="small text-muted">{{ post.senior.email }}</div>
+            </td>
+            <td class="fw-semibold">{{ post.title }}</td>
+            <td>
+              <span class="badge bg-light text-teal border">{{ post.get_category_display }}</span>
+            </td>
+            <td class="small text-secondary" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              {{ post.content }}
+            </td>
+            <td class="small text-muted">{{ post.created_at|date:"N j, Y, g:i a" }}</td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end gap-2">
+                <form method="post" action="{% url 'seniors:process_approval' 'post' post.pk 'approve' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-success fw-bold">
+                    <i class="fas fa-check me-1"></i> Approve
+                  </button>
+                </form>
+
+                <form method="post" action="{% url 'seniors:process_approval' 'post' post.pk 'reject' %}" class="d-inline" onsubmit="return confirm('Are you sure you want to reject this post?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger fw-bold">
+                    <i class="fas fa-times me-1"></i> Reject
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted small">
+              No pending senior guidance posts at this time.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

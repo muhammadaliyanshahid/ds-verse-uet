@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Senior Mentor Registration | UET Data Science Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="custom-card p-4 p-md-5 shadow-lg border-0">
+        <div class="text-center mb-4">
+          <div class="d-inline-flex p-3 rounded-circle bg-teal-subtle text-teal mb-3">
+            <i class="fas fa-user-tie fa-2x"></i>
+          </div>
+          <h2 class="brand-font fw-bold text-navy">Senior Mentor Registration</h2>
+          <p class="text-secondary small">Register as a Senior Student or Alumni Mentor to guide junior BS Data Science students</p>
+        </div>
+
+        <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-3 mb-4">
+          <i class="fas fa-user-shield fa-2x text-warning"></i>
+          <div class="small">
+            <strong>Admin Approval Notice:</strong> Senior mentor account registrations are reviewed and approved by department administrators before you can write guidance posts and answer student queries.
+          </div>
+        </div>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger mb-4">
+              {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="row g-3">
+            <h5 class="brand-font text-teal fw-bold border-bottom pb-2 mb-2">Personal & Account Details</h5>
+
+            <div class="col-md-6">
+              <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">First Name *</label>
+              {{ form.first_name }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">Last Name *</label>
+              {{ form.last_name }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold">Username *</label>
+              {{ form.username }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">Email Address *</label>
+              {{ form.email }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold">Password *</label>
+              {{ form.password }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.confirm_password.id_for_label }}" class="form-label fw-semibold">Confirm Password *</label>
+              {{ form.confirm_password }}
+            </div>
+
+            <h5 class="brand-font text-teal fw-bold border-bottom pb-2 mb-2 mt-4">Mentorship & Academic Profile</h5>
+
+            <div class="col-md-6">
+              <label for="{{ form.roll_number.id_for_label }}" class="form-label fw-semibold">Roll Number *</label>
+              {{ form.roll_number }}
+            </div>
+
+            <div class="col-md-6">
+              <label for="{{ form.batch_year.id_for_label }}" class="form-label fw-semibold">Batch Year *</label>
+              {{ form.batch_year }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ form.expertise.id_for_label }}" class="form-label fw-semibold">Mentorship Expertise *</label>
+              {{ form.expertise }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ form.linkedin_url.id_for_label }}" class="form-label fw-semibold">LinkedIn Profile URL (Optional)</label>
+              {{ form.linkedin_url }}
+            </div>
+
+            <div class="col-12">
+              <label for="{{ form.bio.id_for_label }}" class="form-label fw-semibold">Short Mentor Bio</label>
+              {{ form.bio }}
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top d-grid gap-2">
+            <button type="submit" class="btn btn-uet-primary py-2.5 fs-6">
+              <i class="fas fa-paper-plane me-2"></i> Submit Senior Registration for Approval
+            </button>
+            <a href="{% url 'seniors:hub' %}" class="btn btn-outline-secondary py-2">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
